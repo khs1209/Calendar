@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원정보 수정</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>회원정보 수정</h1>
+        <div class="title-right">
+            <a href="{{ url_for('calendar_view') }}"  class="title-right">캘린더</a>
+        </div>
+    </header>
+    <main>
+        <div class="profile-form-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            {% if message != '일정이 추가되었습니다.' and message != '삭제되었습니다.' %}
+                                <div class="alert alert-{{ category }}">{{ message }}</div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            <form method="POST" action="{{ url_for('profile') }}">
+                {{ form.hidden_tag() }}
+                <div>
+                    {{ form.username.label }} {{ form.username(class="form-control") }}
+                </div>
+                <div>
+                    {{ form.email.label }} {{ form.email(class="form-control") }}
+                </div>
+                <div>
+                    {{ form.current_password.label }} {{ form.current_password(class="form-control") }}
+                </div>
+                <div>
+                    {{ form.password.label }} {{ form.password(class="form-control") }}
+                </div>
+                <div>
+                    {{ form.confirm_password.label }} {{ form.confirm_password(class="form-control") }}
+                </div>
+                <div>
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+            <br>
+            <form id="deleteAccountForm" method="POST" action="{{ url_for('delete_account') }}">
+                {{ form.hidden_tag() }}
+                <button type="submit" class="btn btn-danger">탈퇴</button>
+            </form>
+        </div>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function confirmDelete() {
+            return confirm("정말 탈퇴하시겠습니까?");
+        }
+
+        $(document).ready(function() {
+            $('#deleteAccountForm').on('submit', function(event) {
+                event.preventDefault();
+                if (confirmDelete()) {
+                    $.ajax({
+                        url: $(this).attr('action'),
+                        type: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            alert("탈퇴되었습니다.");
+                            window.location.href = "{{ url_for('calendar_view') }}";
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
