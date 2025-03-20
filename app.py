@@ -227,4 +227,4 @@ def logout():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # 데이터베이스 초기화
-    app.run(debug=True)
+    app.run()
